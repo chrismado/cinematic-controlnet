@@ -94,28 +94,34 @@ Zero object drift in long-horizon interactions up to 60 seconds.
 
 ```
 cinematic-controlnet/
-├── physics/
-│   ├── neural_continuum_solver.py  # Learned latent-space physics approximator
-│   ├── flow_generator.py           # Dense optical flow matrix generation
-│   ├── rgb_renderer.py             # Coarse RGB structural cue generation
-│   └── force_tokenizer.py          # Continuous 3D force → latent tokens
 ├── conditioning/
-│   ├── flow_conditioner.py         # Optical flow → diffusion conditioning
-│   ├── cinematic_controls.py       # Lens, depth, LUT control signals
-│   └── multi_shot_consistency.py   # Long-horizon narrative continuity
+│   ├── __init__.py
+│   ├── cinematic_controls.py
+│   ├── flow_conditioner.py
+│   └── multi_shot_consistency.py
 ├── diffusion/
-│   ├── hunyuan_adapter.py          # HunyuanVideo 1.5 integration
-│   ├── wan2_adapter.py             # Wan2.2 integration
-│   └── distilled_sampler.py        # 4-step distilled sampling
-├── training/
-│   ├── train_physics_solver.py     # Neural continuum mechanics training
-│   ├── train_conditioner.py        # Conditioning pipeline training
-│   └── datasets/                   # Training data loaders
+│   ├── __init__.py
+│   ├── distilled_sampler.py
+│   ├── hunyuan_adapter.py
+│   └── wan2_adapter.py
 ├── inference/
-│   ├── realtime_pipeline.py        # End-to-end real-time inference
-│   └── benchmark.py                # FPS and physics accuracy benchmarks
+│   ├── __init__.py
+│   ├── benchmark.py
+│   └── realtime_pipeline.py
+├── physics/
+│   ├── __init__.py
+│   ├── flow_generator.py
+│   ├── force_tokenizer.py
+│   ├── neural_continuum_solver.py
+│   └── rgb_renderer.py
 ├── tests/
-│   └── test_physics_accuracy.py    # Physics violation detection tests
+│   ├── __init__.py
+│   └── test_physics_accuracy.py
+├── training/
+│   ├── __init__.py
+│   ├── train_conditioner.py
+│   └── train_physics_solver.py
+├── requirements.txt
 └── README.md
 ```
 

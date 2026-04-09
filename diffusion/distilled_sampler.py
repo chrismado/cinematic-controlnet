@@ -58,6 +58,17 @@ class DistilledSampler(nn.Module):
             nn.Linear(channels, channels),
         )
 
+    @staticmethod
+    def _infer_timestep_dim(model: nn.Module, default: int = 256) -> int:
+        """Infer the timestep embedding width expected by the diffusion model."""
+        time_embed = getattr(model, "time_embed", None)
+        if time_embed is None:
+            return default
+        for module in time_embed.modules():
+            if isinstance(module, nn.Linear):
+                return module.in_features
+        return default
+
     def _get_schedule(self, num_steps: int) -> torch.Tensor:
         if num_steps == 1:
             return self.sigma_schedule_1
@@ -84,7 +95,8 @@ class DistilledSampler(nn.Module):
 
         # Model prediction with sigma conditioning
         x_cond = x + sigma_emb
-        pred = model(x_cond, cond, sigma_t.expand(B, 256))
+        timestep_dim = self._infer_timestep_dim(model)
+        pred = model(x_cond, cond, sigma_t.expand(B, timestep_dim))
 
         # Linear interpolation toward clean sample
         alpha = 1.0 - sigma_next / max(sigma, 1e-8)
