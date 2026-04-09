@@ -10,6 +10,7 @@ injected alongside the physics flow conditioning.
 
 Reference: RealWonder (Liu et al., March 2026), arxiv 2603.05449
 """
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -30,6 +31,7 @@ class CinematicControls:
         depth_map: Per-pixel depth tensor [H, W] or [B, H, W], values in meters
         lut_path: Path to a .cube or .npy LUT file for color grading
     """
+
     focal_length: float = 50.0
     aperture: float = 2.8
     depth_map: Optional[torch.Tensor] = field(default=None, repr=False)

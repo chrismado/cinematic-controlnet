@@ -18,6 +18,7 @@ This enables the live interactive director tools that Higgsfield and Decart need
 
 Reference: RealWonder (Liu, Chen, Li, Wang, Yu, Wu — Stanford/USC), arxiv 2603.05449
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,6 +30,7 @@ class NeuralContinuumSolver(nn.Module):
     Operates in the diffusion model's latent space.
     Outputs dense optical flow matrices for action conditioning.
     """
+
     def __init__(
         self,
         latent_dim: int = 512,
@@ -50,9 +52,7 @@ class NeuralContinuumSolver(nn.Module):
 
         # Dynamics predictor: predicts next latent state
         self.dynamics = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(
-                d_model=latent_dim, nhead=8, batch_first=True
-            ),
+            nn.TransformerEncoderLayer(d_model=latent_dim, nhead=8, batch_first=True),
             num_layers=4,
         )
 
@@ -106,9 +106,7 @@ class NeuralContinuumSolver(nn.Module):
         spatial_weights = self.spatial_proj(dynamics_out)
         spatial_weights = F.softmax(spatial_weights, dim=1)
         # Weighted combination: [B, H*W, latent_dim]
-        spatial_tokens = torch.einsum(
-            "bsn,bsd->bnd", spatial_weights, dynamics_out
-        )
+        spatial_tokens = torch.einsum("bsn,bsd->bnd", spatial_weights, dynamics_out)
 
         # Decode optical flow [B, H*W, 2] → [B, H, W, 2]
         optical_flow = self.flow_decoder(spatial_tokens).view(B, H, W, 2)

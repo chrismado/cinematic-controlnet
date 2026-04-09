@@ -4,6 +4,7 @@ Force Tokenizer
 VQ-VAE based tokenizer that converts continuous force fields into
 discrete token sequences for efficient processing and conditioning.
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -90,7 +91,8 @@ class ForceTokenizer(nn.Module):
         return z_q, indices, commitment_loss
 
     def forward(
-        self, force_field: torch.Tensor,
+        self,
+        force_field: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Encode force field to discrete tokens.

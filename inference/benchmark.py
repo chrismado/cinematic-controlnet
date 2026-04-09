@@ -11,15 +11,16 @@ Usage:
     python -m inference.benchmark --compare-blender
     python -m inference.benchmark --device cuda --frames 100
 """
+
 import argparse
 import time
 from typing import Optional
 
 import torch
 
-from physics.neural_continuum_solver import NeuralContinuumSolver
 from conditioning.flow_conditioner import FlowConditioner
 from inference.realtime_pipeline import RealtimePipeline, StubDiffusionModel
+from physics.neural_continuum_solver import NeuralContinuumSolver
 
 
 def sync(device: torch.device):
@@ -77,6 +78,7 @@ def benchmark_per_stage(
 
     # Stage 1: Neural physics solver
     with torch.no_grad():
+
         def run_solver():
             return solver(state, force)
 
@@ -87,6 +89,7 @@ def benchmark_per_stage(
 
     # Stage 2: Flow conditioning
     with torch.no_grad():
+
         def run_conditioner():
             return conditioner(flow, rgb)
 
@@ -96,6 +99,7 @@ def benchmark_per_stage(
 
     # Stage 3: Diffusion model
     with torch.no_grad():
+
         def run_diffusion():
             return diffusion(cond)
 

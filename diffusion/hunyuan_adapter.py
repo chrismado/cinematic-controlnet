@@ -7,10 +7,12 @@ conditioning into the HunyuanVideo 1.5 diffusion backbone.
 Follows the ControlNet pattern: zero-conv ensures the adapter has
 no effect at initialization, then gradually learns conditioning.
 """
+
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pathlib import Path
 
 
 class ZeroConv2d(nn.Module):
@@ -98,10 +100,7 @@ class HunyuanVideoAdapter(nn.Module):
         )
 
         # Adapter blocks at different scales
-        self.blocks = nn.ModuleList([
-            AdapterBlock(model_channels, model_channels)
-            for _ in range(num_blocks)
-        ])
+        self.blocks = nn.ModuleList([AdapterBlock(model_channels, model_channels) for _ in range(num_blocks)])
 
         # Final zero-conv output
         self.output_zero_conv = ZeroConv2d(model_channels, model_channels)

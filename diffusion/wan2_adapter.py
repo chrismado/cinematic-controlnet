@@ -7,6 +7,7 @@ conditioning into the Wan2.2 diffusion backbone.
 Similar architecture to HunyuanVideoAdapter but configured for
 Wan2.2's channel dimensions (1024 vs 1280).
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -78,10 +79,7 @@ class Wan2Adapter(nn.Module):
         )
 
         # Adapter blocks
-        self.blocks = nn.ModuleList([
-            Wan2AdapterBlock(model_channels, model_channels)
-            for _ in range(num_blocks)
-        ])
+        self.blocks = nn.ModuleList([Wan2AdapterBlock(model_channels, model_channels) for _ in range(num_blocks)])
 
         # Final zero-conv output
         self.output_zero_conv = ZeroConv2d(model_channels, model_channels)

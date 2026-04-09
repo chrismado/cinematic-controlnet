@@ -12,9 +12,9 @@ Usage:
     accelerate launch training/train_physics_solver.py \
         --epochs 100 --batch_size 16 --lr 1e-4 --output_dir checkpoints/solver
 """
+
 import argparse
 import math
-import os
 from pathlib import Path
 
 import torch
@@ -53,12 +53,11 @@ def create_synthetic_dataset(
 
 def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps):
     """Cosine learning rate schedule with linear warmup."""
+
     def lr_lambda(current_step):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
-        progress = float(current_step - num_warmup_steps) / float(
-            max(1, num_training_steps - num_warmup_steps)
-        )
+        progress = float(current_step - num_warmup_steps) / float(max(1, num_training_steps - num_warmup_steps))
         return max(0.0, 0.5 * (1.0 + math.cos(math.pi * progress)))
 
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
@@ -121,9 +120,7 @@ def train(args):
 
     # Prepare with accelerator
     if accelerator is not None:
-        model, optimizer, dataloader, scheduler = accelerator.prepare(
-            model, optimizer, dataloader, scheduler
-        )
+        model, optimizer, dataloader, scheduler = accelerator.prepare(model, optimizer, dataloader, scheduler)
     else:
         model = model.to(device)
 
@@ -206,8 +203,9 @@ def train(args):
             state = {
                 "epoch": epoch + 1,
                 "global_step": global_step,
-                "state_dict": model.state_dict() if accelerator is None
-                    else accelerator.unwrap_model(model).state_dict(),
+                "state_dict": model.state_dict()
+                if accelerator is None
+                else accelerator.unwrap_model(model).state_dict(),
                 "optimizer": optimizer.state_dict(),
                 "config": {
                     "latent_dim": args.latent_dim,
@@ -227,8 +225,7 @@ def train(args):
     state = {
         "epoch": args.epochs,
         "global_step": global_step,
-        "state_dict": model.state_dict() if accelerator is None
-            else accelerator.unwrap_model(model).state_dict(),
+        "state_dict": model.state_dict() if accelerator is None else accelerator.unwrap_model(model).state_dict(),
         "config": {
             "latent_dim": args.latent_dim,
             "hidden_dim": args.hidden_dim,

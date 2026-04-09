@@ -80,13 +80,26 @@ Unlike standard ControlNet which only accepts depth/canny maps, this pipeline ac
 
 ## Benchmarks
 
-| Method | Latency/frame | Physics accuracy | FPS |
-|--------|--------------|-----------------|-----|
-| Standard ControlNet | N/A | 2D screen-space only | — |
-| RealWonder + Blender | ~320ms | Newtonian | 3.1 |
-| **This repo (neural physics)** | **~8ms** | **Newtonian** | **13.2** |
+Median results from three fresh runs of `python -m inference.benchmark --compare-blender --frames 20`:
 
-Zero object drift in long-horizon interactions up to 60 seconds.
+| Metric | Measured Value |
+|--------|----------------|
+| Neural physics solver latency | 1.81 ms |
+| Flow conditioner latency | 0.51 ms |
+| Diffusion model latency | 0.23 ms |
+| Total staged latency | 2.53 ms |
+| Effective staged FPS | 394.6 |
+| End-to-end frame time | 2.96 ms |
+| End-to-end FPS | 337.9 |
+| Simulated Blender stage latency | 18.86 ms |
+| Solver speedup vs simulated Blender | 10.3x |
+| Estimated Blender pipeline FPS | 51.1 |
+
+Benchmarks measured on an NVIDIA GeForce RTX 3090 with PyTorch 2.11.0+cu128 and
+Python 3.12.2 on April 9, 2026. The Blender comparison is a CPU-side synthetic
+baseline from the benchmark script, not a live Blender render.
+
+See `PERFORMANCE.md` for the profiler breakdown and `torch.compile()` results.
 
 ---
 

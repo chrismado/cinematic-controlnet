@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "cinematic-controlnet"
+version = "0.1.0"
+description = "Physics-conditioned ControlNet stack for cinematic video generation"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [{name = "Chris Matteau"}]
+dependencies = [
+    "torch>=2.2.0",
+    "diffusers>=0.27.0",
+    "transformers>=4.39.0",
+    "accelerate>=0.28.0",
+    "opencv-python>=4.9.0",
+    "numpy>=1.26.0",
+    "einops>=0.7.0",
+    "huggingface_hub>=0.22.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "mypy", "ruff", "pre-commit"]
+docs = ["sphinx", "sphinx-autodoc-typehints"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: end-to-end integration tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+extend-exclude = ["docs", "examples/*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"examples/*" = ["E501"]
+"tests/*" = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+exclude = "(^docs/|^examples/|^tests/)"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["conditioning*", "diffusion*", "inference*", "physics*", "training*"]
+
+[tool.setuptools.package-data]
+conditioning = ["py.typed"]
+diffusion = ["py.typed"]
+inference = ["py.typed"]
+physics = ["py.typed"]
+training = ["py.typed"]

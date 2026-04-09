@@ -7,6 +7,7 @@ consistency across multiple shots in a cinematic sequence.
 Ensures that lighting, color grading, character appearance, and
 scene geometry remain coherent when cutting between camera angles.
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -19,7 +20,7 @@ class CrossAttentionBlock(nn.Module):
         super().__init__()
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
-        self.scale = self.head_dim ** -0.5
+        self.scale = self.head_dim**-0.5
 
         self.q_proj = nn.Linear(dim, dim)
         self.k_proj = nn.Linear(dim, dim)
@@ -88,16 +89,20 @@ class MultiShotConsistency(nn.Module):
         # Cross-attention layers
         self.layers = nn.ModuleList()
         for _ in range(num_layers):
-            self.layers.append(nn.ModuleDict({
-                "cross_attn": CrossAttentionBlock(feature_dim, num_heads, dropout),
-                "ffn": nn.Sequential(
-                    nn.LayerNorm(feature_dim),
-                    nn.Linear(feature_dim, feature_dim * 4),
-                    nn.GELU(),
-                    nn.Linear(feature_dim * 4, feature_dim),
-                    nn.Dropout(dropout),
-                ),
-            }))
+            self.layers.append(
+                nn.ModuleDict(
+                    {
+                        "cross_attn": CrossAttentionBlock(feature_dim, num_heads, dropout),
+                        "ffn": nn.Sequential(
+                            nn.LayerNorm(feature_dim),
+                            nn.Linear(feature_dim, feature_dim * 4),
+                            nn.GELU(),
+                            nn.Linear(feature_dim * 4, feature_dim),
+                            nn.Dropout(dropout),
+                        ),
+                    }
+                )
+            )
 
         self.output_norm = nn.LayerNorm(feature_dim)
 

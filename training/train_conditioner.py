@@ -9,6 +9,7 @@ Usage:
     accelerate launch training/train_conditioner.py \
         --epochs 50 --batch_size 8 --lr 5e-5 --output_dir checkpoints/conditioner
 """
+
 import argparse
 import math
 from pathlib import Path
@@ -49,12 +50,11 @@ def create_synthetic_dataset(
 
 def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps):
     """Cosine LR schedule with linear warmup."""
+
     def lr_lambda(current_step):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
-        progress = float(current_step - num_warmup_steps) / float(
-            max(1, num_training_steps - num_warmup_steps)
-        )
+        progress = float(current_step - num_warmup_steps) / float(max(1, num_training_steps - num_warmup_steps))
         return max(0.0, 0.5 * (1.0 + math.cos(math.pi * progress)))
 
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
@@ -158,8 +158,10 @@ def train(args):
             # Downsample output to match target size
             if output.shape[2:] != target.shape[2:]:
                 output_ds = F.interpolate(
-                    output, size=target.shape[2:],
-                    mode="bilinear", align_corners=False,
+                    output,
+                    size=target.shape[2:],
+                    mode="bilinear",
+                    align_corners=False,
                 )
             else:
                 output_ds = output
@@ -214,8 +216,9 @@ def train(args):
             state = {
                 "epoch": epoch + 1,
                 "global_step": global_step,
-                "state_dict": conditioner.state_dict() if accelerator is None
-                    else accelerator.unwrap_model(conditioner).state_dict(),
+                "state_dict": conditioner.state_dict()
+                if accelerator is None
+                else accelerator.unwrap_model(conditioner).state_dict(),
                 "optimizer": optimizer.state_dict(),
                 "config": {
                     "hidden_dim": args.hidden_dim,
@@ -234,8 +237,9 @@ def train(args):
     state = {
         "epoch": args.epochs,
         "global_step": global_step,
-        "state_dict": conditioner.state_dict() if accelerator is None
-            else accelerator.unwrap_model(conditioner).state_dict(),
+        "state_dict": conditioner.state_dict()
+        if accelerator is None
+        else accelerator.unwrap_model(conditioner).state_dict(),
         "config": {
             "hidden_dim": args.hidden_dim,
             "conditioning_dim": conditioning_dim,

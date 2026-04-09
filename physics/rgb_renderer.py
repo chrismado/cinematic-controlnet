@@ -4,10 +4,13 @@ Latent RGB Renderer
 Decodes latent representations combined with optical flow into
 coarse structural RGB frames using transposed convolutions.
 """
+
+from pathlib import Path
+from typing import Any
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pathlib import Path
 
 
 class LatentRGBRenderer(nn.Module):
@@ -86,8 +89,10 @@ class LatentRGBRenderer(nn.Module):
         # Encode flow and downsample to match latent spatial size
         flow_feat = self.flow_encoder(flow)
         flow_feat = F.interpolate(
-            flow_feat, size=(self.init_h, self.init_w),
-            mode="bilinear", align_corners=False,
+            flow_feat,
+            size=(self.init_h, self.init_w),
+            mode="bilinear",
+            align_corners=False,
         )
 
         # Fuse latent + flow features
@@ -99,14 +104,21 @@ class LatentRGBRenderer(nn.Module):
         # Ensure exact output size
         if rgb.shape[2:] != (self.output_h, self.output_w):
             rgb = F.interpolate(
-                rgb, size=(self.output_h, self.output_w),
-                mode="bilinear", align_corners=False,
+                rgb,
+                size=(self.output_h, self.output_w),
+                mode="bilinear",
+                align_corners=False,
             )
 
         return rgb
 
     @classmethod
-    def from_pretrained(cls, checkpoint_path: str, device: str = "cpu", **kwargs) -> "LatentRGBRenderer":
+    def from_pretrained(
+        cls,
+        checkpoint_path: str,
+        device: str = "cpu",
+        **kwargs: Any,
+    ) -> "LatentRGBRenderer":
         """
         Load a pretrained LatentRGBRenderer from a checkpoint file.
 

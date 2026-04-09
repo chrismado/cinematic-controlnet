@@ -6,6 +6,7 @@ flow fields from physics state and previous frame information.
 
 Output: [B, 2, H, W] flow field (horizontal and vertical displacement).
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -21,7 +22,7 @@ def flow_to_rgb(flow: torch.Tensor, max_mag: float = -1.0) -> torch.Tensor:
     u = flow[:, 0]  # [B, H, W]
     v = flow[:, 1]
 
-    mag = torch.sqrt(u ** 2 + v ** 2)
+    mag = torch.sqrt(u**2 + v**2)
     if max_mag <= 0:
         max_mag = mag.max().item() + 1e-8
 
@@ -49,12 +50,24 @@ def flow_to_rgb(flow: torch.Tensor, max_mag: float = -1.0) -> torch.Tensor:
     mask4 = i == 4
     mask5 = i == 5
 
-    r[mask0] = val[mask0]; g[mask0] = t[mask0]; b[mask0] = p[mask0]
-    r[mask1] = q[mask1]; g[mask1] = val[mask1]; b[mask1] = p[mask1]
-    r[mask2] = p[mask2]; g[mask2] = val[mask2]; b[mask2] = t[mask2]
-    r[mask3] = p[mask3]; g[mask3] = q[mask3]; b[mask3] = val[mask3]
-    r[mask4] = t[mask4]; g[mask4] = p[mask4]; b[mask4] = val[mask4]
-    r[mask5] = val[mask5]; g[mask5] = p[mask5]; b[mask5] = q[mask5]
+    r[mask0] = val[mask0]
+    g[mask0] = t[mask0]
+    b[mask0] = p[mask0]
+    r[mask1] = q[mask1]
+    g[mask1] = val[mask1]
+    b[mask1] = p[mask1]
+    r[mask2] = p[mask2]
+    g[mask2] = val[mask2]
+    b[mask2] = t[mask2]
+    r[mask3] = p[mask3]
+    g[mask3] = q[mask3]
+    b[mask3] = val[mask3]
+    r[mask4] = t[mask4]
+    g[mask4] = p[mask4]
+    b[mask4] = val[mask4]
+    r[mask5] = val[mask5]
+    g[mask5] = p[mask5]
+    b[mask5] = q[mask5]
 
     return torch.stack([r, g, b], dim=1)  # [B, 3, H, W]
 

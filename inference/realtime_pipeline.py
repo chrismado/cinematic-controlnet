@@ -9,6 +9,7 @@ Target: 13.2 FPS at 480x832 resolution.
 Usage:
     python -m inference.realtime_pipeline --force "gravity:9.8,wind:2.0" --frames 60
 """
+
 import argparse
 import time
 from typing import Optional
@@ -16,13 +17,13 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from physics.neural_continuum_solver import NeuralContinuumSolver
-from conditioning.flow_conditioner import FlowConditioner
 from conditioning.cinematic_controls import (
-    CinematicControls,
     CinematicControlEncoder,
+    CinematicControls,
     apply_controls,
 )
+from conditioning.flow_conditioner import FlowConditioner
+from physics.neural_continuum_solver import NeuralContinuumSolver
 
 
 class StubDiffusionModel(nn.Module):
@@ -53,9 +54,7 @@ class StubDiffusionModel(nn.Module):
             frame: [B, 3, output_H, output_W]
         """
         x = self.decode(conditioning)
-        x = nn.functional.interpolate(
-            x, size=(self.output_h, self.output_w), mode="bilinear", align_corners=False
-        )
+        x = nn.functional.interpolate(x, size=(self.output_h, self.output_w), mode="bilinear", align_corners=False)
         return x
 
 
@@ -207,19 +206,19 @@ def parse_force_string(force_str: str) -> torch.Tensor:
     """Parse 'gravity:9.8,wind:2.0' into a [1, 6] tensor."""
     force = torch.zeros(1, 6)
     for item in force_str.split(","):
-        key, val = item.split(":")
-        val = float(val)
+        key, value_str = item.split(":")
+        value = float(value_str)
         key = key.strip().lower()
         if key == "gravity":
-            force[0, 1] = -val  # negative y
+            force[0, 1] = -value  # negative y
         elif key == "wind":
-            force[0, 0] = val
+            force[0, 0] = value
         elif key == "torque":
-            force[0, 3] = val
+            force[0, 3] = value
     return force
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Real-time cinematic generation pipeline")
     parser.add_argument("--force", type=str, default="gravity:9.8", help="Force spec, e.g. gravity:9.8,wind:2.0")
     parser.add_argument("--frames", type=int, default=60, help="Number of frames to generate")

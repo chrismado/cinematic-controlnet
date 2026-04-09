@@ -6,24 +6,25 @@ Tests all modules on CPU with random tensors to verify:
   - No runtime errors with expected inputs
   - Gradient flow works for trainable modules
 """
+
 import unittest
 
 import torch
 
-from physics.neural_continuum_solver import NeuralContinuumSolver
-from physics.flow_generator import OpticalFlowGenerator, flow_to_rgb
-from physics.rgb_renderer import LatentRGBRenderer
-from physics.force_tokenizer import ForceTokenizer
-from conditioning.flow_conditioner import FlowConditioner
 from conditioning.cinematic_controls import (
-    CinematicControls,
     CinematicControlEncoder,
+    CinematicControls,
     apply_controls,
 )
+from conditioning.flow_conditioner import FlowConditioner
 from conditioning.multi_shot_consistency import MultiShotConsistency
+from diffusion.distilled_sampler import DistilledSampler
 from diffusion.hunyuan_adapter import HunyuanVideoAdapter
 from diffusion.wan2_adapter import Wan2Adapter
-from diffusion.distilled_sampler import DistilledSampler
+from physics.flow_generator import OpticalFlowGenerator, flow_to_rgb
+from physics.force_tokenizer import ForceTokenizer
+from physics.neural_continuum_solver import NeuralContinuumSolver
+from physics.rgb_renderer import LatentRGBRenderer
 
 
 class TestNeuralContinuumSolver(unittest.TestCase):
@@ -49,8 +50,11 @@ class TestNeuralContinuumSolver(unittest.TestCase):
 class TestOpticalFlowGenerator(unittest.TestCase):
     def setUp(self):
         self.model = OpticalFlowGenerator(
-            state_dim=64, prev_frame_channels=3,
-            base_channels=16, output_h=16, output_w=16,
+            state_dim=64,
+            prev_frame_channels=3,
+            base_channels=16,
+            output_h=16,
+            output_w=16,
         )
 
     def test_forward_shape(self):
@@ -70,8 +74,10 @@ class TestOpticalFlowGenerator(unittest.TestCase):
 class TestLatentRGBRenderer(unittest.TestCase):
     def setUp(self):
         self.model = LatentRGBRenderer(
-            latent_dim=64, hidden_dim=32,
-            output_h=32, output_w=32,
+            latent_dim=64,
+            hidden_dim=32,
+            output_h=32,
+            output_w=32,
         )
 
     def test_forward_shape(self):
@@ -87,8 +93,10 @@ class TestLatentRGBRenderer(unittest.TestCase):
 class TestForceTokenizer(unittest.TestCase):
     def setUp(self):
         self.model = ForceTokenizer(
-            force_channels=6, hidden_dim=32,
-            codebook_size=64, codebook_dim=16,
+            force_channels=6,
+            hidden_dim=32,
+            codebook_size=64,
+            codebook_dim=16,
         )
 
     def test_forward_shape(self):
@@ -157,8 +165,10 @@ class TestCinematicControls(unittest.TestCase):
 class TestMultiShotConsistency(unittest.TestCase):
     def setUp(self):
         self.model = MultiShotConsistency(
-            feature_dim=64, num_heads=4,
-            num_layers=2, metadata_dim=8,
+            feature_dim=64,
+            num_heads=4,
+            num_layers=2,
+            metadata_dim=8,
         )
 
     def test_forward_shape(self):
@@ -180,8 +190,10 @@ class TestMultiShotConsistency(unittest.TestCase):
 class TestHunyuanVideoAdapter(unittest.TestCase):
     def setUp(self):
         self.model = HunyuanVideoAdapter(
-            model_channels=64, cond_channels=64,
-            num_blocks=2, timestep_dim=32,
+            model_channels=64,
+            cond_channels=64,
+            num_blocks=2,
+            timestep_dim=32,
         )
 
     def test_forward_shape(self):
@@ -204,8 +216,10 @@ class TestHunyuanVideoAdapter(unittest.TestCase):
 class TestWan2Adapter(unittest.TestCase):
     def setUp(self):
         self.model = Wan2Adapter(
-            model_channels=64, cond_channels=64,
-            num_blocks=2, timestep_dim=32,
+            model_channels=64,
+            cond_channels=64,
+            num_blocks=2,
+            timestep_dim=32,
         )
 
     def test_forward_shape(self):
@@ -227,8 +241,10 @@ class TestDistilledSampler(unittest.TestCase):
     def setUp(self):
         self.sampler = DistilledSampler(channels=64, num_refinement_blocks=2)
         self.model = HunyuanVideoAdapter(
-            model_channels=64, cond_channels=64,
-            num_blocks=2, timestep_dim=32,
+            model_channels=64,
+            cond_channels=64,
+            num_blocks=2,
+            timestep_dim=32,
         )
 
     def test_sample_4_step(self):

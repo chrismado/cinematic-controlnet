@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  inference:
+    build: .
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./checkpoints:/app/checkpoints
+    command: python -m inference.realtime_pipeline --help

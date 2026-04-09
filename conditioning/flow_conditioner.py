@@ -10,6 +10,7 @@ pattern but operates on physics-derived flow rather than 2D edge maps.
 
 Reference: RealWonder (Liu et al., March 2026), arxiv 2603.05449
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -5,6 +5,7 @@ Few-step sampler supporting 1, 2, or 4-step generation via
 consistency distillation. Enables real-time inference by reducing
 the typical 20-50 diffusion steps to 1-4.
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -43,11 +44,13 @@ class DistilledSampler(nn.Module):
         # Refinement network for direct prediction
         layers = []
         for _ in range(num_refinement_blocks):
-            layers.extend([
-                nn.Conv2d(channels, channels, 3, padding=1),
-                nn.GroupNorm(32, channels),
-                nn.SiLU(),
-            ])
+            layers.extend(
+                [
+                    nn.Conv2d(channels, channels, 3, padding=1),
+                    nn.GroupNorm(32, channels),
+                    nn.SiLU(),
+                ]
+            )
         layers.append(nn.Conv2d(channels, channels, 1))
         self.refine_net = nn.Sequential(*layers)
 
