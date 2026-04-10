@@ -186,7 +186,7 @@ def train(args):
                         wandb.log(log_dict, step=global_step)
 
                 print(
-                    f"[Epoch {epoch+1}/{args.epochs}] "
+                    f"[Epoch {epoch + 1}/{args.epochs}] "
                     f"Step {global_step} | "
                     f"Loss: {loss.item():.4f} | "
                     f"Flow: {flow_loss.item():.4f} | "
@@ -195,11 +195,11 @@ def train(args):
                 )
 
         avg_loss = epoch_loss / len(dataloader)
-        print(f"Epoch {epoch+1}/{args.epochs} complete. Avg loss: {avg_loss:.4f}")
+        print(f"Epoch {epoch + 1}/{args.epochs} complete. Avg loss: {avg_loss:.4f}")
 
         # Checkpointing
         if (epoch + 1) % args.save_every == 0:
-            ckpt_path = output_dir / f"solver_epoch_{epoch+1}.pt"
+            ckpt_path = output_dir / f"solver_epoch_{epoch + 1}.pt"
             state = {
                 "epoch": epoch + 1,
                 "global_step": global_step,
