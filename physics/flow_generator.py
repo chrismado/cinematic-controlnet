@@ -132,6 +132,7 @@ class OpticalFlowGenerator(nn.Module):
         super().__init__()
         self.output_h = output_h
         self.output_w = output_w
+        self.base_channels = base_channels
 
         # Project physics state to spatial feature map
         self.state_proj = nn.Sequential(
@@ -179,7 +180,7 @@ class OpticalFlowGenerator(nn.Module):
 
         # Project state to spatial map [B, base_ch, H/4, W/4]
         state_flat = self.state_proj(physics_state)
-        ch = self.down1.conv[0].in_channels - 3  # base_channels
+        ch = self.base_channels
         state_map = state_flat.view(B, ch, H // 4, W // 4)
         # Upsample state map to match prev_frame resolution
         state_map = F.interpolate(state_map, size=(H, W), mode="bilinear", align_corners=False)

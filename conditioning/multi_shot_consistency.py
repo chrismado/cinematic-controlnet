@@ -11,6 +11,7 @@ scene geometry remain coherent when cutting between camera angles.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from typing import cast
 
 
 class CrossAttentionBlock(nn.Module):
@@ -135,9 +136,12 @@ class MultiShotConsistency(nn.Module):
         outputs = []
         for i in range(num_shots):
             x = enriched[i]
-            for layer in self.layers:
-                x = x + layer["cross_attn"](x, global_context)
-                x = x + layer["ffn"](x)
+            for layer_module in self.layers:
+                layer = cast(nn.ModuleDict, layer_module)
+                cross_attn = cast(CrossAttentionBlock, layer["cross_attn"])
+                ffn = cast(nn.Sequential, layer["ffn"])
+                x = x + cross_attn(x, global_context)
+                x = x + ffn(x)
             x = self.output_norm(x)
             outputs.append(x)
 

@@ -1,7 +1,7 @@
 """
-Unit Tests for All Modules
+Module Shape and Smoke Tests
 
-Tests all modules on CPU with random tensors to verify:
+Runs CPU smoke tests across the repo to verify:
   - Forward pass shapes are correct
   - No runtime errors with expected inputs
   - Gradient flow works for trainable modules

@@ -13,6 +13,7 @@ Usage:
 import argparse
 import math
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -48,10 +49,14 @@ def create_synthetic_dataset(
     return TensorDataset(flows, rgbs, targets)
 
 
-def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps):
+def get_cosine_schedule_with_warmup(
+    optimizer: torch.optim.Optimizer,
+    num_warmup_steps: int,
+    num_training_steps: int,
+) -> torch.optim.lr_scheduler.LambdaLR:
     """Cosine LR schedule with linear warmup."""
 
-    def lr_lambda(current_step):
+    def lr_lambda(current_step: int) -> float:
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
         progress = float(current_step - num_warmup_steps) / float(max(1, num_training_steps - num_warmup_steps))
@@ -60,7 +65,7 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_st
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
 
-def train(args):
+def train(args: argparse.Namespace) -> None:
     # Initialize accelerator
     if Accelerator is not None:
         accelerator = Accelerator(log_with="wandb" if args.use_wandb and wandb else None)
@@ -259,7 +264,7 @@ def train(args):
             wandb.finish()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Train Flow Conditioner")
 
     # Model

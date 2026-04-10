@@ -23,7 +23,8 @@ class ZeroConv(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, 1)
         nn.init.zeros_(self.conv.weight)
-        nn.init.zeros_(self.conv.bias)
+        if self.conv.bias is not None:
+            nn.init.zeros_(self.conv.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.conv(x)
