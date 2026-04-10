@@ -4,11 +4,29 @@
 
 A real-time action-conditioned video generation framework implementing RealWonder (Liu et al., Stanford/USC, March 2026) with a critical architectural upgrade: the offline Blender physics engine is replaced with a real-time learned neural continuum mechanics solver operating in the latent space.
 
-Standard ControlNet is legacy technology. This repo builds what comes next.
+The thesis: 2D conditioning alone is not enough for director-facing video tools. Creative teams need controls that connect camera language, motion, force, scene structure, and multi-shot continuity.
 
 ---
 
-## Why ControlNet is Obsolete
+## Portfolio Context
+
+This repo is part of [Creative AI Workflows](https://github.com/chrismado/creative-ai-workflows), a portfolio showcase connecting generative video, 3D scene review, creative QA, and enterprise deployment.
+
+In that system, `cinematic-controlnet` is the **cinematic control layer**. It explores how a director's intent can become model controls: camera path, depth, motion, physical force, style cues, and continuity constraints.
+
+### Customer-Facing Use Case
+
+A creative team wants to move beyond one-off prompt results and produce repeatable shot variants from the same brief. This repo is positioned as a workflow for turning direction into controllable generation, then reviewing variants in a way that supports real creative feedback.
+
+### Demo Narrative
+
+- Start with a director-style brief: subject, camera, motion, tone, and continuity target.
+- Show how that brief becomes control inputs rather than only a text prompt.
+- Generate variants, compare them, and explain which version best preserves creative intent.
+
+---
+
+## Why 2D Control Is Not Enough
 
 Standard ControlNet (lllyasviel/controlnet) and its video adaptations (control-a-video, ControlVideo) operate entirely in 2D screen space. They extract condition maps from source videos and guide generation — but they have no structural understanding of 3D scenes and cannot interpret how continuous 3D forces propagate through an environment.
 
