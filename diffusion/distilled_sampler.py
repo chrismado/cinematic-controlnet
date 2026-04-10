@@ -169,8 +169,9 @@ class DistilledSampler(nn.Module):
         with torch.no_grad():
             pred_4 = self.sample(model, x_noisy, cond, num_steps=4)
 
-        # 1-step prediction (student)
-        pred_1 = self.sample(model, x_noisy, cond, num_steps=1)
+        # 1-step prediction (student) — must enable gradients since self.sample() uses @torch.no_grad()
+        with torch.enable_grad():
+            pred_1 = self.sample(model, x_noisy, cond, num_steps=1)
 
         # Consistency loss: 1-step should match 4-step
         loss = F.mse_loss(pred_1, pred_4.detach())
