@@ -71,10 +71,13 @@ MODEL_PRESETS: dict[str, list[dict[str, str]]] = {
 }
 
 
+def _target_path(asset: dict[str, str], output_dir: Path) -> Path:
+    return output_dir / asset["subdir"] / Path(asset["filename"])
+
+
 def _download_asset(asset: dict[str, str], output_dir: Path, dry_run: bool) -> tuple[str, str]:
-    target_dir = output_dir / asset["subdir"]
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_path = target_dir / Path(asset["filename"]).name
+    target_path = _target_path(asset, output_dir)
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
     if target_path.exists():
         return asset["label"], f"skipped (already exists at {target_path})"
@@ -86,7 +89,7 @@ def _download_asset(asset: dict[str, str], output_dir: Path, dry_run: bool) -> t
         repo_id=asset["repo_id"],
         filename=asset["filename"],
         revision=asset["revision"],
-        local_dir=target_dir,
+        local_dir=output_dir / asset["subdir"],
         local_dir_use_symlinks=False,
     )
     return asset["label"], f"downloaded to {local_path}"

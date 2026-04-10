@@ -16,17 +16,25 @@ pytestmark = pytest.mark.integration
 
 def test_physics_to_conditioning_pipeline_runs_on_cpu() -> None:
     solver = NeuralContinuumSolver(latent_dim=64, hidden_dim=32, output_h=16, output_w=16).cpu().eval()
-    generator = OpticalFlowGenerator(
-        state_dim=64,
-        base_channels=16,
-        output_h=16,
-        output_w=16,
-    ).cpu().eval()
-    conditioner = FlowConditioner(
-        hidden_dim=32,
-        conditioning_dim=128,
-        backend="hunyuan",
-    ).cpu().eval()
+    generator = (
+        OpticalFlowGenerator(
+            state_dim=64,
+            base_channels=16,
+            output_h=16,
+            output_w=16,
+        )
+        .cpu()
+        .eval()
+    )
+    conditioner = (
+        FlowConditioner(
+            hidden_dim=32,
+            conditioning_dim=128,
+            backend="hunyuan",
+        )
+        .cpu()
+        .eval()
+    )
 
     latent = torch.randn(2, 8, 64)
     force = torch.randn(2, 6)
@@ -59,9 +67,7 @@ def test_training_loop_runs_two_steps_on_synthetic_data(tmp_path: Path) -> None:
     losses: list[float] = []
     for step, (latent, force, target_flow, target_rgb) in enumerate(loader):
         pred_flow, pred_rgb = model(latent, force)
-        loss = torch.nn.functional.mse_loss(pred_flow, target_flow) + torch.nn.functional.mse_loss(
-            pred_rgb, target_rgb
-        )
+        loss = torch.nn.functional.mse_loss(pred_flow, target_flow) + torch.nn.functional.mse_loss(pred_rgb, target_rgb)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

@@ -120,7 +120,7 @@ def main() -> None:
     print(f"Device: {device}")
     print(f"Eager latency: {eager_ms:.2f} ms")
     if compiled_ms is not None:
-        speedup = eager_ms / compiled_ms if compiled_ms > 0 else float('inf')
+        speedup = eager_ms / compiled_ms if compiled_ms > 0 else float("inf")
         print(f"Compiled latency: {compiled_ms:.2f} ms")
         print(f"Compile speedup: {speedup:.2f}x")
         print(f"Max abs diff: {max_diff:.3e}")
