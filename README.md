@@ -10,7 +10,7 @@ The thesis: 2D conditioning alone is not enough for director-facing video tools.
 
 ## Portfolio Context
 
-This repo is part of [Creative AI Workflows](https://github.com/chrismado/creative-ai-workflows), a portfolio showcase connecting generative video, 3D scene review, creative QA, and enterprise deployment.
+This repo is part of [Creative AI Workflows](https://chrismado.github.io/creative-ai-workflows/) ([source](https://github.com/chrismado/creative-ai-workflows)), a portfolio showcase connecting generative video, 3D scene review, creative QA, and enterprise deployment.
 
 In that system, `cinematic-controlnet` is the **cinematic control layer**. It explores how a director's intent can become model controls: camera path, depth, motion, physical force, style cues, and continuity constraints.
 
