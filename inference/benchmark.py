@@ -14,7 +14,7 @@ Usage:
 
 import argparse
 import time
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 
@@ -23,12 +23,17 @@ from inference.realtime_pipeline import RealtimePipeline, StubDiffusionModel
 from physics.neural_continuum_solver import NeuralContinuumSolver
 
 
-def sync(device: torch.device):
+def sync(device: torch.device) -> None:
     if device.type == "cuda":
         torch.cuda.synchronize()
 
 
-def measure_stage(fn, device: torch.device, warmup: int = 5, iterations: int = 50) -> float:
+def measure_stage(
+    fn: Callable[[], object],
+    device: torch.device,
+    warmup: int = 5,
+    iterations: int = 50,
+) -> float:
     """Run fn() and return average latency in milliseconds."""
     for _ in range(warmup):
         fn()
@@ -79,7 +84,7 @@ def benchmark_per_stage(
     # Stage 1: Neural physics solver
     with torch.no_grad():
 
-        def run_solver():
+        def run_solver() -> object:
             return solver(state, force)
 
         results["neural_physics_solver"] = measure_stage(run_solver, dev, iterations=iterations)
@@ -90,7 +95,7 @@ def benchmark_per_stage(
     # Stage 2: Flow conditioning
     with torch.no_grad():
 
-        def run_conditioner():
+        def run_conditioner() -> torch.Tensor:
             return conditioner(flow, rgb)
 
         results["flow_conditioner"] = measure_stage(run_conditioner, dev, iterations=iterations)
@@ -100,7 +105,7 @@ def benchmark_per_stage(
     # Stage 3: Diffusion model
     with torch.no_grad():
 
-        def run_diffusion():
+        def run_diffusion() -> torch.Tensor:
             return diffusion(cond)
 
         results["diffusion_model"] = measure_stage(run_diffusion, dev, iterations=iterations)
@@ -142,7 +147,7 @@ def simulate_blender_baseline(iterations: int = 20) -> float:
     return sum(times) / len(times)
 
 
-def print_table(stage_results: dict[str, float], blender_ms: Optional[float] = None):
+def print_table(stage_results: dict[str, float], blender_ms: Optional[float] = None) -> None:
     """Print formatted benchmark table."""
     print()
     print("=" * 65)
@@ -185,7 +190,7 @@ def print_table(stage_results: dict[str, float], blender_ms: Optional[float] = N
         print()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Benchmark latency per pipeline stage")
     parser.add_argument("--compare-blender", action="store_true", help="Compare against simulated Blender baseline")
     parser.add_argument("--device", type=str, default=None)

@@ -72,16 +72,22 @@ class DistilledSampler(nn.Module):
                 return module.in_features
         return default
 
+    def _schedule_tensor(self, name: str) -> torch.Tensor:
+        schedule = getattr(self, name)
+        if not isinstance(schedule, torch.Tensor):
+            raise TypeError(f"Buffer {name} is not a tensor")
+        return schedule
+
     def _get_schedule(self, num_steps: int) -> torch.Tensor:
         if num_steps == 1:
-            return self.sigma_schedule_1
+            return self._schedule_tensor("sigma_schedule_1")
         elif num_steps == 2:
-            return self.sigma_schedule_2
+            return self._schedule_tensor("sigma_schedule_2")
         elif num_steps == 4:
-            return self.sigma_schedule_4
+            return self._schedule_tensor("sigma_schedule_4")
         else:
             # Linear schedule for arbitrary step counts
-            return torch.linspace(1.0, 0.0, num_steps + 1, device=self.sigma_schedule_1.device)
+            return torch.linspace(1.0, 0.0, num_steps + 1, device=self._schedule_tensor("sigma_schedule_1").device)
 
     def _denoise_step(
         self,

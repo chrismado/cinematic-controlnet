@@ -9,6 +9,7 @@ no effect at initialization, then gradually learns conditioning.
 """
 
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -22,7 +23,8 @@ class ZeroConv2d(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, 1)
         nn.init.zeros_(self.conv.weight)
-        nn.init.zeros_(self.conv.bias)
+        if self.conv.bias is not None:
+            nn.init.zeros_(self.conv.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.conv(x)
@@ -35,7 +37,8 @@ class ZeroLinear(nn.Module):
         super().__init__()
         self.linear = nn.Linear(in_features, out_features)
         nn.init.zeros_(self.linear.weight)
-        nn.init.zeros_(self.linear.bias)
+        if self.linear.bias is not None:
+            nn.init.zeros_(self.linear.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.linear(x)
@@ -140,7 +143,7 @@ class HunyuanVideoAdapter(nn.Module):
         cls,
         checkpoint_path: str,
         device: str = "cpu",
-        **kwargs,
+        **kwargs: Any,
     ) -> "HunyuanVideoAdapter":
         """
         Load adapter weights from a checkpoint.

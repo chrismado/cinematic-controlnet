@@ -85,12 +85,12 @@ def _download_asset(asset: dict[str, str], output_dir: Path, dry_run: bool) -> t
     if dry_run:
         return asset["label"], f"would download {asset['repo_id']}:{asset['filename']} -> {target_path}"
 
+    local_dir = str(output_dir / asset["subdir"])
     local_path = hf_hub_download(
         repo_id=asset["repo_id"],
         filename=asset["filename"],
         revision=asset["revision"],
-        local_dir=output_dir / asset["subdir"],
-        local_dir_use_symlinks=False,
+        local_dir=local_dir,
     )
     return asset["label"], f"downloaded to {local_path}"
 
