@@ -1,5 +1,4 @@
-"""
-Multi-Shot Consistency Module
+"""Multi-Shot Consistency Module
 
 Cross-attention mechanism that enforces temporal and stylistic
 consistency across multiple shots in a cinematic sequence.
@@ -8,10 +7,11 @@ Ensures that lighting, color grading, character appearance, and
 scene geometry remain coherent when cutting between camera angles.
 """
 
+from typing import cast
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import cast
 
 
 class CrossAttentionBlock(nn.Module):
