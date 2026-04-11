@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import torch
+
+torch = pytest.importorskip("torch")
 from torch.utils.data import DataLoader
 
 from conditioning.flow_conditioner import FlowConditioner

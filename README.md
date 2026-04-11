@@ -170,6 +170,8 @@ cinematic-controlnet/
 └── README.md
 ```
 
+Current test files: `tests/test_integration.py` and `tests/test_module_shapes.py`.
+
 ---
 
 ## Quick Start
@@ -188,6 +190,10 @@ python -m inference.benchmark --compare-blender
 # Run prototype training script
 python -m training.train_physics_solver --dataset physion --epochs 100
 ```
+
+The training scripts and smoke tests exercise the prototype modules, but the
+default path still assumes synthetic or placeholder data unless you wire in
+real datasets and checkpoints.
 
 ---
 

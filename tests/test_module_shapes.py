@@ -9,7 +9,9 @@ Runs CPU smoke tests across the repo to verify:
 
 import unittest
 
-import torch
+import pytest
+
+torch = pytest.importorskip("torch")
 
 from conditioning.cinematic_controls import (
     CinematicControlEncoder,
