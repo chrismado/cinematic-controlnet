@@ -21,6 +21,25 @@ The honest value of this repo is the workflow design: how director intent could 
 
 ---
 
+## Validation Snapshot
+
+Verified locally on April 11, 2026:
+
+- `python -m pytest -q` -> `1 passed, 2 skipped`
+
+What that means:
+
+- The lightweight environment-aware test path is green.
+- The repo now fails honestly when heavyweight runtime dependencies are unavailable instead of pretending full validation happened.
+
+What it does not mean:
+
+- It does not prove trained model quality.
+- It does not prove real-data or checkpoint-backed inference quality.
+- It does not replace the need for a GPU PyTorch environment plus real checkpoints if this repo were taken further.
+
+---
+
 ## Portfolio Context
 
 This repo is part of [Creative AI Workflows](https://chrismado.github.io/creative-ai-workflows/) ([source](https://github.com/chrismado/creative-ai-workflows)), a portfolio showcase connecting generative video, 3D scene review, creative QA, and enterprise deployment.
