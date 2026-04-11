@@ -111,6 +111,37 @@ class RealtimePipeline:
         self.output_h = output_h
         self.output_w = output_w
 
+    def _advance_latent_state(
+        self,
+        latent_state: torch.Tensor,
+        force_vector: torch.Tensor,
+        optical_flow: torch.Tensor,
+        coarse_rgb: torch.Tensor,
+        generated_frame: torch.Tensor,
+    ) -> torch.Tensor:
+        """Advance the latent state so multi-frame generation is autoregressive.
+
+        The repo does not yet have a trained recurrent world-state model, so we
+        evolve the sequence with a deterministic summary of the current physics
+        solve and rendered frame. This keeps the prototype honest while avoiding
+        the degenerate "same frame repeated N times" behavior.
+        """
+        latent_dim = latent_state.shape[-1]
+
+        force_summary = self.solver.force_encoder(force_vector)
+        flow_summary = optical_flow.mean(dim=(1, 2))
+        rgb_summary = coarse_rgb.mean(dim=(1, 2))
+        frame_summary = generated_frame.mean(dim=(2, 3))
+
+        summary = torch.cat([flow_summary, rgb_summary, frame_summary], dim=1)
+        repeat_factor = (latent_dim + summary.shape[1] - 1) // summary.shape[1]
+        summary_latent = summary.repeat(1, repeat_factor)[:, :latent_dim]
+
+        next_token = 0.85 * latent_state[:, -1, :] + 0.15 * (force_summary + 0.05 * summary_latent)
+        next_state = torch.roll(latent_state, shifts=-1, dims=1).clone()
+        next_state[:, -1, :] = next_token
+        return next_state
+
     @torch.no_grad()
     def run(
         self,
@@ -156,6 +187,16 @@ class RealtimePipeline:
             # Diffusion model generates final frame
             frame = self.diffusion(conditioning)
             frames.append(frame)
+
+            # Advance the latent sequence so subsequent frames respond to the
+            # previous generation instead of replaying the same state forever.
+            latent_state = self._advance_latent_state(
+                latent_state=latent_state,
+                force_vector=force_vector,
+                optical_flow=optical_flow,
+                coarse_rgb=coarse_rgb,
+                generated_frame=frame,
+            )
 
         return frames
 

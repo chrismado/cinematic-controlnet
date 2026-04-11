@@ -21,6 +21,7 @@ from conditioning.multi_shot_consistency import MultiShotConsistency
 from diffusion.distilled_sampler import DistilledSampler
 from diffusion.hunyuan_adapter import HunyuanVideoAdapter
 from diffusion.wan2_adapter import Wan2Adapter
+from inference.realtime_pipeline import RealtimePipeline, StubDiffusionModel
 from physics.flow_generator import OpticalFlowGenerator, flow_to_rgb
 from physics.force_tokenizer import ForceTokenizer
 from physics.neural_continuum_solver import NeuralContinuumSolver
@@ -136,6 +137,46 @@ class TestFlowConditioner(unittest.TestCase):
         out = model(flow, rgb)
         self.assertEqual(out.shape[0], 2)
         self.assertEqual(out.shape[1], 48)
+
+    def test_gradients_reach_conditioner_through_frozen_diffusion(self):
+        model = FlowConditioner(hidden_dim=16, conditioning_dim=32, backend="hunyuan")
+        diffusion = StubDiffusionModel(conditioning_dim=32, output_h=16, output_w=16)
+        diffusion.eval()
+        for param in diffusion.parameters():
+            param.requires_grad = False
+
+        flow = torch.randn(2, 16, 16, 2)
+        rgb = torch.randn(2, 16, 16, 3)
+        target = torch.randn(2, 3, 16, 16)
+
+        output = diffusion(model(flow, rgb))
+        loss = torch.nn.functional.mse_loss(output, target)
+        loss.backward()
+
+        self.assertIsNotNone(model.zero_conv.conv.weight.grad)
+        self.assertGreater(model.zero_conv.conv.weight.grad.abs().sum().item(), 0.0)
+
+
+class TestRealtimePipeline(unittest.TestCase):
+    def test_multiframe_generation_advances_state(self):
+        torch.manual_seed(0)
+        pipeline = RealtimePipeline(
+            latent_dim=32,
+            hidden_dim=16,
+            output_h=32,
+            output_w=32,
+            physics_h=8,
+            physics_w=8,
+            backend="wan2",
+            device="cpu",
+        )
+
+        force = torch.randn(1, 6)
+        state = torch.randn(1, 6, 32)
+        frames = pipeline.run(force, state, num_frames=3)
+
+        self.assertEqual(len(frames), 3)
+        self.assertFalse(torch.allclose(frames[0], frames[1]))
 
 
 class TestCinematicControls(unittest.TestCase):

@@ -155,9 +155,11 @@ def train(args: argparse.Namespace) -> None:
             # Forward through conditioner
             conditioning = conditioner(flow, rgb)
 
-            # Forward through frozen diffusion
-            with torch.no_grad():
-                output = diffusion(conditioning)
+            # Forward through the frozen diffusion stub without detaching the
+            # conditioner output. The diffusion weights stay frozen via
+            # ``requires_grad = False``, but gradients must still flow back into
+            # the conditioner parameters.
+            output = diffusion(conditioning)
 
             # Downsample output to match target size
             if output.shape[2:] != target.shape[2:]:
