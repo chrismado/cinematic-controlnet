@@ -1,5 +1,8 @@
 # cinematic-controlnet
 
+[![CI](https://github.com/chrismado/cinematic-controlnet/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/chrismado/cinematic-controlnet/actions/workflows/ci.yml)
+[![Portfolio](https://img.shields.io/badge/portfolio-creative%20ai%20workflows-f1b84b?style=flat-square)](https://chrismado.github.io/creative-ai-workflows/)
+
 **Action-Conditioned Cinematic Control Architecture Prototype**
 
 An architecture prototype inspired by action-conditioned video generation systems such as RealWonder. The repo explores how an offline simulator bridge could be replaced by a lightweight learned dynamics module that exposes director-friendly controls in the latent space.
@@ -31,12 +34,25 @@ What that means:
 
 - The lightweight environment-aware test path is green.
 - The repo now fails honestly when heavyweight runtime dependencies are unavailable instead of pretending full validation happened.
+- GitHub CI is green on `main`
 
 What it does not mean:
 
 - It does not prove trained model quality.
 - It does not prove real-data or checkpoint-backed inference quality.
 - It does not replace the need for a GPU PyTorch environment plus real checkpoints if this repo were taken further.
+
+## Read This Repo For
+
+- How director-facing controls could enter a generation pipeline before prompt-only iteration starts to break down.
+- How physics, flow, camera, and continuity signals can be organized into a workflow-shaped prototype.
+- How a creative control demo can be framed honestly even when the underlying model is still untrained.
+
+## Do Not Read This Repo As
+
+- Proof of trained physics realism.
+- Proof of production video quality.
+- A Blender replacement benchmark.
 
 ---
 
