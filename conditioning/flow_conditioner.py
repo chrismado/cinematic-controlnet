@@ -98,8 +98,9 @@ class FlowConditioner(nn.Module):
         # Project to diffusion conditioning dim [B, conditioning_dim, H/4, W/4]
         projected = self.proj(features)
 
-        # Zero-conv gated injection
-        conditioning = self.zero_conv(projected)
+        # Keep a non-zero base path for the prototype while preserving the
+        # zero-init residual branch that can be trained toward stronger control.
+        conditioning = projected + self.zero_conv(projected)
 
         return conditioning
 
