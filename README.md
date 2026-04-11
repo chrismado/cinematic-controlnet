@@ -1,10 +1,23 @@
 # cinematic-controlnet
 
-**Action-Conditioned Cinematic Bridge via Neural Continuum Mechanics**
+**Action-Conditioned Cinematic Control Architecture Prototype**
 
-A real-time action-conditioned video generation framework implementing RealWonder (Liu et al., Stanford/USC, March 2026) with a critical architectural upgrade: the offline Blender physics engine is replaced with a real-time learned neural continuum mechanics solver operating in the latent space.
+An architecture prototype inspired by action-conditioned video generation systems such as RealWonder. The repo explores how an offline simulator bridge could be replaced by a lightweight learned dynamics module that exposes director-friendly controls in the latent space.
 
 The thesis: 2D conditioning alone is not enough for director-facing video tools. Creative teams need controls that connect camera language, motion, force, scene structure, and multi-shot continuity.
+
+---
+
+## Current Status
+
+This is an architecture prototype, not a trained production video model.
+
+- The default neural modules are untrained and randomly initialized unless you wire in real checkpoints.
+- The repo demonstrates the control interface, conditioning data flow, benchmark harness, and integration points.
+- It does not prove trained physics simulation quality, production video generation quality, or real Blender replacement quality.
+- The benchmark numbers measure staged prototype module latency and a synthetic Blender proxy, not end-to-end quality on a real simulator or diffusion backbone.
+
+The honest value of this repo is the workflow design: how director intent could move from force, camera, lens, depth, style, and continuity inputs into a controllable generation pipeline.
 
 ---
 
@@ -32,11 +45,11 @@ Standard ControlNet (lllyasviel/controlnet) and its video adaptations (control-a
 
 The result: physically plausible-looking outputs that violate real physics. Objects drift, forces don't propagate, fluid dynamics are wrong.
 
-**RealWonder (March 2026) solved this** by using a physics simulation engine as an intermediate bridge — translating physical actions through a simulator into dense optical flow matrices, which then condition a 4-step distilled diffusion model. The result: 13.2 FPS real-time generation with correct Newtonian mechanics.
+RealWonder-style systems address this by using a physics simulation engine as an intermediate bridge, translating physical actions through a simulator into dense optical flow matrices that condition a distilled diffusion model.
 
 **The problem with Blender:** Using Blender as the physics engine introduces 200-400ms rendering latency per frame, breaking the real-time claim. For interactive directors tools and live video modeling, this is a hard architectural failure.
 
-**This repo's solution:** Replace Blender with a lightweight learned neural dynamics model that approximates physical forces directly within the latent space — enabling the live real-time feedback loops required for interactive cinematic production.
+**This repo's design target:** Explore whether a lightweight learned dynamics model could approximate physical force responses directly within the latent space, enabling the live feedback loops required for interactive cinematic production.
 
 ---
 
@@ -48,9 +61,9 @@ Director Input
         │
         ▼
 ┌────────────────────────────────┐
-│   Neural Continuum Mechanics   │  ← KEY UPGRADE
-│   Solver (latent space)        │    Replaces offline Blender
-│   Approximates: rigid body,    │    ~8ms inference vs ~300ms
+│   Neural Continuum Mechanics   │  ← DESIGN TARGET
+│   Solver (latent space)        │    Candidate Blender substitute
+│   Approximates: rigid body,    │    Target: low-latency inference
 │   fluid dynamics, cloth,       │
 │   granular materials           │
 └─────────────┬──────────────────┘
@@ -88,17 +101,17 @@ Unlike standard ControlNet which only accepts depth/canny maps, this pipeline ac
 
 ## Stack
 
-- **Neural physics:** Custom lightweight continuum mechanics solver (latent space)
+- **Neural physics:** Prototype continuum mechanics module in latent space
 - **Optical flow:** Dense flow matrices via PWC-Net adapted for latent projection
-- **Diffusion backbone:** HunyuanVideo 1.5 or Wan2.2 (4-step distilled)
-- **Training hardware:** RTX 4090 (diffusion backbone) + RTX 3090 (physics solver)
-- **Framework:** PyTorch, CUDA custom kernels
+- **Diffusion backbone:** Adapter interface for HunyuanVideo / Wan-style backbones
+- **Training status:** Untrained by default; real checkpoints must be supplied separately
+- **Framework:** PyTorch with CUDA-capable execution when available
 
 ---
 
 ## Benchmarks
 
-Median results from three fresh runs of `python -m inference.benchmark --compare-blender --frames 20`:
+Latency smoke-test results from three runs of `python -m inference.benchmark --compare-blender --frames 20`:
 
 | Metric | Measured Value |
 |--------|----------------|
@@ -115,7 +128,8 @@ Median results from three fresh runs of `python -m inference.benchmark --compare
 
 Benchmarks measured on an NVIDIA GeForce RTX 3090 with PyTorch 2.11.0+cu128 and
 Python 3.12.2 on April 9, 2026. The Blender comparison is a CPU-side synthetic
-baseline from the benchmark script, not a live Blender render.
+baseline from the benchmark script, not a live Blender render. These numbers are
+prototype latency measurements, not trained-model quality measurements.
 
 See `PERFORMANCE.md` for the profiler breakdown and `torch.compile()` results.
 
@@ -168,10 +182,10 @@ pip install -r requirements.txt
 # Run interactive demo
 python -m inference.realtime_pipeline --force "gravity:9.8,wind:2.0" --frames 60
 
-# Benchmark against RealWonder baseline
+# Benchmark staged prototype latency
 python -m inference.benchmark --compare-blender
 
-# Train neural physics solver
+# Run prototype training script
 python -m training.train_physics_solver --dataset physion --epochs 100
 ```
 
@@ -179,15 +193,15 @@ python -m training.train_physics_solver --dataset physion --epochs 100
 
 ## References
 
-1. **RealWonder: Real-Time Physical Action-Conditioned Video Generation** — Liu, Chen, Li, Wang, Yu, Wu (Stanford University / USC), March 2026. arxiv 2603.05449. Core architecture this repo implements.
+1. **RealWonder: Real-Time Physical Action-Conditioned Video Generation** — Liu, Chen, Li, Wang, Yu, Wu (Stanford University / USC), March 2026. arxiv 2603.05449. Architecture reference for this prototype.
 2. **PerpetualWonder** — Long-horizon context collapse solution for continuous generation.
 3. **ActionParty** — Multi-subject action binding in generative video.
 4. **GenReward** — Video diffusion as RL reward model.
 5. **Weifeng-Chen/control-a-video** — 2D screen-space ControlNet for video (legacy approach this supersedes).
 6. **YBYBZhang/ControlVideo** — ICLR 2024 training-free ControlNet (legacy approach this supersedes).
 7. **lllyasviel/controlnet** — Original ControlNet (legacy image-space architecture).
-8. **Wan2.2** — Open-source diffusion backbone used as generation model.
-9. **HunyuanVideo 1.5** — Alternative diffusion backbone.
+8. **Wan2.2** — Open-source diffusion backbone family for adapter exploration.
+9. **HunyuanVideo 1.5** — Alternative diffusion backbone family for adapter exploration.
 
 ---
 
