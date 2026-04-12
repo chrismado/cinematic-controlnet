@@ -28,10 +28,6 @@ The honest value of this repo is the workflow design: how director intent could 
 
 Verified locally on April 11, 2026:
 
-- `python -m pytest -q` -> `1 passed, 2 skipped`
-
-What that means:
-
 - The lightweight environment-aware test path is green.
 - The repo now fails honestly when heavyweight runtime dependencies are unavailable instead of pretending full validation happened.
 - GitHub CI is green on `main`
@@ -196,7 +192,8 @@ cinematic-controlnet/
 │   └── rgb_renderer.py
 ├── tests/
 │   ├── __init__.py
-│   └── test_physics_accuracy.py
+│   ├── test_integration.py
+│   └── test_module_shapes.py
 ├── training/
 │   ├── __init__.py
 │   ├── train_conditioner.py
@@ -246,4 +243,4 @@ real datasets and checkpoints.
 
 ---
 
-*Targeting Higgsfield AI (#1 signal), Runway ML GWM-1 team, Decart live video modeling roles.*
+*Built to explore how director intent could become a controllable workflow layer before prompt-only iteration starts to break down.*
